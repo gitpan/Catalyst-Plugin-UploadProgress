@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Catalyst-Plugin-UploadProgress
+version: 0.02
+author:
+  - Andy Grundman, <andy@hybridized.org>
+abstract: Realtime file upload information
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm
