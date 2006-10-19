@@ -58,6 +58,14 @@ DEMO
     requires Catalyst::Engine::HTTP::POE >= 0.02) or script/upload_server.pl
     -f. The -f enables forking for each new request.
 
+ENGINE SUPPORT
+    The included demo application has been tested and is known to work on
+    the following setups with Catalyst 5.7003:
+
+    C::E::HTTP (server.pl) with -f flag (OSX) C::E::HTTP::POE 0.03 (OSX)
+    C::E::Apache2::MP20 1.07 with Apache 2.0.58, mod_perl 2.0.2 (OSX)
+    C::E::FastCGI with Apache 2.0.55, mod_fastcgi 2.4.2 (Ubuntu)
+
 INTERNAL METHODS
     You don't need to know about these methods, but they are documented here
     for developers.

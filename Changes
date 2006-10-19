@@ -1,5 +1,10 @@
 Revision history for Perl extension Catalyst::Plugin::UploadProgress
 
+0.03    2006-10-18 22:15:00
+        - Handle race condition where progress handler is
+          called before any upload data is received.
+        - Document engines that have been tested.
+
 0.02    2006-04-22 20:00:00
         - Initial release.
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use NEXT;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub prepare_body_chunk {
     my ( $c, $chunk ) = @_;
@@ -73,6 +73,17 @@ sub upload_progress_output {
     $upload_id ||= $c->req->params->{progress_id};
     
     my $progress = $c->upload_progress( $upload_id );
+
+    # there could be a race condition where /progress is called before
+    # the upload has passed through prepare_body_chunk.  Set a default
+    # progress hash in this case.  Once through prepare_body_chunk,
+    # the values will be correct.
+    if ( !ref $progress ) {
+        $progress = {
+            received => 0,
+            size     => -1,
+        };
+    }
     
     # format the progress data as JSON
     my $json   = '{"size":%d,"received":%d}';
@@ -91,7 +102,7 @@ sub upload_progress_output {
 sub upload_progress_javascript {
     my $c = shift;
 
-	require Catalyst::Plugin::UploadProgress::Static;
+    require Catalyst::Plugin::UploadProgress::Static;
     
     my @output;
     push @output,
@@ -177,6 +188,16 @@ requires 2 concurrent connections (one for the upload and one for the
 Ajax, you will need to use either script/upload_poe.pl (which requires
 L<Catalyst::Engine::HTTP::POE> >= 0.02) or script/upload_server.pl -f.  
 The -f enables forking for each new request.
+
+=head1 ENGINE SUPPORT
+
+The included demo application has been tested and is known to work on
+the following setups with Catalyst 5.7003:
+
+C::E::HTTP (server.pl) with -f flag (OSX)
+C::E::HTTP::POE 0.03 (OSX)
+C::E::Apache2::MP20 1.07 with Apache 2.0.58, mod_perl 2.0.2 (OSX)
+C::E::FastCGI with Apache 2.0.55, mod_fastcgi 2.4.2 (Ubuntu)
 
 =head1 INTERNAL METHODS
 
