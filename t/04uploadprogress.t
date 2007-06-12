@@ -24,6 +24,8 @@ else {
     plan tests => 12;
 }
 
+use Data::Dump qw(dump);
+
 # test a single file upload
 {
     my $id = '38f8a17599a8dd9c80bfb01643404f80';
@@ -43,12 +45,12 @@ else {
     );
     
     ok( my $response = request($request), 'Request' );
-    ok( $response->is_success, 'Upload ok' );
+    is( $response->content, 'ok', 'Upload ok' );
     
     ok( $response = request("http://localhost/progress?progress_id=$id"), 'Request' );
     is( $response->content_type, 'text/x-json', 'Progress JSON ok' );
     my $content = $response->content;
-    my ( $size, $received ) = $content =~ m/^\{"size":(\d+),"received":(\d+)\}/;
+    my ( $size, $received ) = $content =~ m/"size":(\d+),"received":(\d+)/;
     cmp_ok( $size, '>', 16384, 'JSON size ok' );
     is( $size, $received, 'JSON received ok' );
 }
@@ -79,12 +81,13 @@ else {
     );
     
     ok( my $response = request($request), 'Request' );
-    ok( $response->is_success, 'Multi-file upload OK' );
+    is( $response->content, 'ok', 'Multi-file upload OK' );
     
-    ok( $response = request("http://localhost/progress?progress_id=$id"), 'Request' );
+    # test that any URL with '?progress_id=...' in it will work
+    ok( $response = request("http://localhost/deep/path/progress?progress_id=$id"), 'Request' );
     is( $response->content_type, 'text/x-json', 'Progress JSON ok' );
     my $content = $response->content;
-    my ( $size, $received ) = $content =~ m/^\{"size":(\d+),"received":(\d+)\}/;
+    my ( $size, $received ) = $content =~ m/"size":(\d+),"received":(\d+)/;
     cmp_ok( $size, '>', 49152, 'JSON size ok' );
     is( $size, $received, 'JSON received ok' );
 }

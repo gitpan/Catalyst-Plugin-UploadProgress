@@ -1,7 +1,8 @@
-package Upload::Controller::Upload;
+package # hide from PAUSE
+    Upload::Controller::Upload;
 
 use strict;
-use base 'Catalyst::Base';
+use base 'Catalyst::Controller';
 use Data::Dumper;
 
 sub default : Private {

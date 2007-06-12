@@ -10,6 +10,8 @@
         <td>
 [% IF finished -%]
           <span class="finished">Transfer complete  ([% size %])</span>
+[% ELSIF aborted -%]
+          <span class="aborted">Transfer aborted</span>
 [% ELSE -%]
           [% received %] of [% size %]
 [% END -%]

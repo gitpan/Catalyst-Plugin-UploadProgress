@@ -1,4 +1,5 @@
-package Upload;
+package # hide from PAUSE
+    Upload;
 
 use strict;
 use Catalyst;
@@ -18,7 +19,7 @@ Upload->setup( qw/-Debug
 sub default : Private {
     my ( $self, $c ) = @_;
 
-    $c->res->redirect( '/upload' );
+    $c->res->redirect( $c->uri_for('/upload') );
 }
 
 sub end : Private {

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use NEXT;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub prepare_body_chunk {
     my ( $c, $chunk ) = @_;
@@ -35,15 +35,48 @@ sub prepare_body_chunk {
     }
 }
 
+sub prepare_body {
+    my $c = shift;
+    
+    # Detect if the user stopped the upload, prepare_body will die with an invalid
+    # content-length error
+    
+    my $croaked;
+    
+    {
+        no warnings 'redefine';
+        local *Carp::croak = sub {
+            $croaked = shift;
+        };
+        
+        $c->NEXT::prepare_body(@_);
+    }
+    
+    if ( $croaked ) {
+        if ( my $id = $c->req->query_parameters->{progress_id} ) {
+            $c->log->info( "UploadProgress: User aborted upload $id" );
+        
+            # Update progress to flag this so javascript will stop polling
+            my $progress = $c->cache->get( 'upload_progress_' . $id ) || {};
+        
+            $progress->{aborted} = 1;
+        
+            $c->cache->set( 'upload_progress_' . $id, $progress );
+        }
+        
+        # rethrow the error
+        Catalyst::Exception->throw( $croaked );
+    }
+}
+
 sub dispatch {
     my $c = shift;
     
-    # if the URI is /progress?progress_id=<id> intercept the request
+    # if the URI query string is ?progress_id=<id> intercept the request
     # and display the progress JSON.
-    
     my $query = $c->req->uri->path_query;
-    if ( $query =~ /^\/progress\?progress_id=[a-f0-9]{32}$/ ) {
-        return $c->upload_progress_output( $c->req->params->{progress_id} );
+    if ( $c->req->method eq 'GET' && $query =~ m{\?progress_id=([a-f0-9]{32})$} ) {
+        return $c->upload_progress_output( $1 );
     }
     
     return $c->NEXT::ACTUAL::dispatch(@_);
@@ -86,8 +119,11 @@ sub upload_progress_output {
     }
     
     # format the progress data as JSON
-    my $json   = '{"size":%d,"received":%d}';
-    my $output = sprintf $json, $progress->{size}, $progress->{received};
+    my $json   = '{"size":%d,"received":%d,"aborted":%d}';
+    my $output = sprintf $json, 
+        $progress->{size},
+        $progress->{received},
+        $progress->{aborted} || 0;
     
     $c->response->headers->header( Pragma  => 'no-cache' );
     $c->response->headers->header( Expires 

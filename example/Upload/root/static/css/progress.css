@@ -20,6 +20,10 @@
     color: #667799;
 }
 
+.aborted {
+    color: red;
+}
+
 .progressmeter .meter {
     position: relative;
     background-color: lightgrey;

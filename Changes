@@ -1,5 +1,12 @@
 Revision history for Perl extension Catalyst::Plugin::UploadProgress
 
+0.04    2007-06-12 14:00:00
+        - Fixed issue where you could only run UploadProgress in apps at
+          the webserver root.
+        - Aborted uploads are now detected and the javascript will stop polling
+          for updates when this happens.
+        - Switched to Module::Install.
+
 0.03    2006-10-18 22:15:00
         - Handle race condition where progress handler is
           called before any upload data is received.
