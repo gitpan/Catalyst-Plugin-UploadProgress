@@ -1,7 +1,7 @@
 package TestApp;
 
 use strict;
-use Catalyst;
+use base qw/Catalyst/;
 use Data::Dumper;
 
 our $VERSION = '0.01';
@@ -15,18 +15,13 @@ TestApp->config(
 
 # Fail gracefully if we don't have FastMmap
 my @plugins = ();
-eval { 
-    require Catalyst::Plugin::Cache::FastMmap; 
+eval {
+    require Catalyst::Plugin::Cache::FastMmap;
 };
 unless ($@) {
     push @plugins, qw/UploadProgress Cache::FastMmap/;
 }
-TestApp->setup( @plugins );
-        
-sub upload : Local {
-    my ( $self, $c ) = @_;
-    
-    $c->res->output( 'ok' );
-}
+Catalyst->import( @plugins );
+__PACKAGE__->setup;
 
 1;

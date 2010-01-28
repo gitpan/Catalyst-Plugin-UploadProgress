@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::Plugin::UploadProgress
 
+0.05   2010-01-12 00:22:05
+        - Convert to a Moose role
+        - Fixed POD coverage.
+
 0.04    2007-06-12 14:00:00
         - Fixed issue where you could only run UploadProgress in apps at
           the webserver root.
@@ -15,6 +19,6 @@ Revision history for Perl extension Catalyst::Plugin::UploadProgress
 0.02    2006-04-22 20:00:00
         - Initial release.
 
-0.01    
+0.01
         - Not released.
 
