@@ -1,9 +1,10 @@
 package Catalyst::Plugin::UploadProgress;
 use Moose::Role;
 use Catalyst::Exception;
+use MooseX::RelatedClassRoles ();
 use namespace::autoclean;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 requires qw/
     prepare_body_chunk
@@ -12,34 +13,12 @@ requires qw/
     setup_finalize
 /;
 
-# I'm concerned that this doesn't call super() at all..
-around 'prepare_body_chunk' => sub {
-    my ( $orig, $c, $chunk ) = @_;
 
-    my $body = $c->request->{_body};
-    $body->add( $chunk );
-
-    my $id = $c->req->query_parameters->{progress_id};
-
-    if ( $id ) {
-        # store current progress in cache
-        my $progress = $c->cache->get( 'upload_progress_' . $id );
-
-        if ( !defined $progress ) {
-            # new upload
-            $progress = {
-                size     => $body->content_length,
-                received => length $chunk,
-            };
-
-            $c->cache->set( 'upload_progress_' . $id, $progress );
-        }
-        else {
-            $progress->{received} += length $chunk;
-
-            $c->cache->set( 'upload_progress_' . $id, $progress );
-        }
-    }
+around _build_request_constructor_args => sub {
+    my ($orig, $self, @args) = @_;
+    my $p = $self->$orig(@args);
+    $p->{_cache} = $self->cache;
+    return $p;
 };
 
 around 'prepare_body' => sub {
@@ -99,6 +78,9 @@ after 'setup_finalize' => sub {
             message => 'UploadProgress requires a cache plugin.'
         );
     }
+    Class::MOP::class_of('MooseX::RelatedClassRoles')
+      ->apply($c->meta, name => 'request', require_class_accessor => 0);
+    $c->apply_request_class_roles('Catalyst::Plugin::UploadProgress::Role::Request');
 };
 
 sub upload_progress {
@@ -307,3 +289,4 @@ This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
+

@@ -7,8 +7,9 @@ use Module::Install::AuthorTests;
 name 'Catalyst-Plugin-UploadProgress';
 all_from 'lib/Catalyst/Plugin/UploadProgress.pm';
 
-requires 'Catalyst::Runtime' => '5.80004';
+requires 'Catalyst::Runtime' => '5.90017';
 requires 'Moose';
+requires 'MooseX::RelatedClassRoles';
 requires 'namespace::autoclean';
 
 author_requires 'Test::Pod' => '1.14';

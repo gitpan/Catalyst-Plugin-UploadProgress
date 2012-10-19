@@ -1,5 +1,10 @@
 Revision history for Perl extension Catalyst::Plugin::UploadProgress
 
+0.06
+        - Fix to work with newer versions of Catalyst 5.90017
+          where logic is moved into the request class, by applying
+          a request class role.
+
 0.05   2010-01-12 00:22:05
         - Convert to a Moose role
         - Fixed POD coverage.
